@@ -1,17 +1,31 @@
+import { useEffect } from "react";
 import "./App.css";
 import { useSignInWithOAuth } from "./services/auth";
+import useSessionStore from "./stores/useSessionStore";
 import { supabase } from "./supabaseClient";
 
 function App() {
   const [signIn] = useSignInWithOAuth();
-  supabase.auth.onAuthStateChange((e, s) => console.log(e, s));
+  const { session, setSession, resetSession } = useSessionStore();
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((e, s) => setSession(s));
+  }, []);
+
   return (
     <div className="">
-      <button onClick={() => signIn({ provider: "discord" })}>
+      <button
+        onClick={() =>
+          supabase.auth.signUp({
+            email: "adhamhassan100@yahoo.com",
+            password: "PassWord1234",
+          })
+        }
+      >
         sign with otp
       </button>
 
       <button onClick={() => supabase.auth.signOut()}>sign out</button>
+      <div className="">{JSON.stringify(session)}</div>
     </div>
   );
 }
